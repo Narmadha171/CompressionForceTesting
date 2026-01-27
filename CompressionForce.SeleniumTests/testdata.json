@@ -1,0 +1,26 @@
+{
+  "BaseUrl": "https://localhost:44379/",
+
+  "LoginByUsername": [
+    {
+      "Scenario": "ValidUN-ValidPW",
+      "Username": "validuser",
+      "Password": "validpass"
+    },
+    {
+      "Scenario": "ValidUN-InvalidPW",
+      "Username": "validuser",
+      "Password": "wrongpass"
+    },
+    {
+      "Scenario": "InvalidUN-ValidPW",
+      "Username": "wronguser",
+      "Password": "validpass"
+    },
+    {
+      "Scenario": "InvalidUN-InvalidPW",
+      "Username": "wronguser",
+      "Password": "wrongpass"
+    }
+  ]
+}

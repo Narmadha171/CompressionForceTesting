@@ -3,168 +3,271 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using Newtonsoft.Json;
+using CompressionForce.SeleniumTests.Models;
 using System;
 using System.IO;
-using System.Threading;
 
-namespace CompressionForce.SeleniumTests
+namespace CompressionForce.SeleniumTests.Tests
 {
-    // ===== JSON Models =====
-    public class User
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class Config
-    {
-        public string Url { get; set; }
-        public User ValidUser { get; set; }
-        public User InvalidUser { get; set; }
-    }
-
-    // ===== Selenium Tests =====
     [TestFixture]
     public class AuthenticationTests
     {
-        IWebDriver driver;
-        WebDriverWait wait;
-        public Config config;
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private AuthConfig config;
 
-        // ===== OneTime Setup =====
-        [OneTimeSetUp]
+        // ================= SETUP =================
+        [SetUp]
         public void Setup()
         {
-            // 1️⃣ Load JSON config
-            string jsonText = File.ReadAllText("config.json");
-            config = JsonConvert.DeserializeObject<Config>(jsonText);
-
-            // 2️⃣ Setup Chrome
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--ignore-certificate-errors");
+
             driver = new ChromeDriver(options);
             driver.Manage().Window.Maximize();
-
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-            driver.Navigate().GoToUrl(config.Url);
+
+            string jsonPath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "TestData",
+                "authData.json"
+            );
+
+            config = JsonConvert.DeserializeObject<AuthConfig>(File.ReadAllText(jsonPath));
         }
 
-        // ===== VALID LOGIN =====
+        // ==================================================
+        // LOGIN USING USERNAME + PASSWORD (3 COMBINATIONS)
+        // ==================================================
+
         [Test, Order(1)]
-        public void Login_Valid_User()
+        public void UsernameLogin_ValidUsername_ValidPassword()
         {
-            Thread.Sleep(2000);
-            EnterCredentials(config.ValidUser.Email, config.ValidUser.Password);
-            ClickLogin();
-            Thread.Sleep(4000);
+            NavigateToLogin();
 
-            Assert.That(IsUserLoggedIn(), Is.True);
+            EnterLoginCredentials(
+                config.LoginByUsername.ValidUsername,
+                config.LoginByUsername.ValidPassword
+            );
+
+            ClickLogin();
+            AssertLoginSuccess();
+            Logout();
         }
 
-        // ===== LOGOUT =====
         [Test, Order(2)]
-        public void Logout_User()
+        public void UsernameLogin_ValidUsername_InvalidPassword()
         {
-            Thread.Sleep(2000);
-            try
-            {
-                var logoutBtn = wait.Until(d => d.FindElement(By.XPath("//a[contains(text(),'Logout')]")));
-                logoutBtn.Click();
-            }
-            catch { /* already logged out */ }
+            NavigateToLogin();
 
-            Thread.Sleep(3000);
-            Assert.That(IsLoginPageVisible(), Is.True);
-        }
+            EnterLoginCredentials(
+                config.LoginByUsername.ValidUsername,
+                config.LoginByUsername.InvalidPassword
+            );
 
-        // ===== INVALID LOGIN =====
-        [Test, Order(3)]
-        public void Login_Invalid_User()
-        {
-            EnterCredentials(config.InvalidUser.Email, config.InvalidUser.Password);
-            Thread.Sleep(2000);
             ClickLogin();
-            Thread.Sleep(4000);
-
-            Assert.That(IsErrorDisplayed(), Is.True);
+            AssertLoginFailure();
         }
 
-        // ===== SIGNUP PAGE =====
+        [Test, Order(3)]
+        public void UsernameLogin_InvalidUsername_InvalidPassword()
+        {
+            NavigateToLogin();
+
+            EnterLoginCredentials(
+                config.LoginByUsername.InvalidUsername,
+                config.LoginByUsername.InvalidPassword
+            );
+
+            ClickLogin();
+            AssertLoginFailure();
+        }
+
+        // ===========================================
+        // LOGIN USING EMAIL + PASSWORD (3 COMBINATIONS)
+        // ===========================================
+
         [Test, Order(4)]
-        public void Signup_Page_Test()
+        public void EmailLogin_ValidEmail_ValidPassword()
         {
-            EnsureLoggedOut(); // ensures user is not logged in
-            var signupLink = wait.Until(d => d.FindElement(By.XPath("//a[contains(text(),'Sign Up')]")));
-            signupLink.Click();
-            Thread.Sleep(3000);
+            NavigateToLogin();
 
-            Assert.That(driver.Url.Contains("Signup"), Is.True);
+            EnterLoginCredentials(
+                config.LoginByEmail.ValidEmail,
+                config.LoginByEmail.ValidPassword
+            );
+
+            ClickLogin();
+            AssertLoginSuccess();
+            Logout();
         }
 
-        // ===== HELPERS =====
-        void EnterCredentials(string user, string pass)
+        [Test, Order(5)]
+        public void EmailLogin_InvalidEmail_InvalidPassword()
         {
-            var email = wait.Until(d => d.FindElement(By.Id("Email")));
-            email.Clear();
-            email.SendKeys(user);
+            NavigateToLogin();
 
-            var pwd = driver.FindElement(By.Id("Password"));
-            pwd.Clear();
-            pwd.SendKeys(pass);
+            EnterLoginCredentials(
+                config.LoginByEmail.InvalidEmail,
+                config.LoginByEmail.InvalidPassword
+            );
+
+            ClickLogin();
+            AssertLoginFailure();
         }
 
-        void ClickLogin()
+        [Test, Order(6)]
+        public void EmailLogin_InvalidEmail_ValidPassword()
+        {
+            NavigateToLogin();
+
+            EnterLoginCredentials(
+                config.LoginByEmail.InvalidEmail,
+                config.LoginByEmail.ValidPassword
+            );
+
+            ClickLogin();
+            AssertLoginFailure();
+        }
+
+        // ================= SIGN UP TESTS =================
+
+        [Test, Order(7)]
+        public void SignUp_With_Valid_Details()
+        {
+            NavigateToSignUp();
+
+            string username = "User" + DateTime.Now.Ticks;
+            string email = "user" + DateTime.Now.Ticks + "@test.com";
+
+            EnterSignUpDetails(
+                username,
+                email,
+                config.SignUp.ValidPassword,
+                config.SignUp.ValidPassword
+            );
+
+            ClickSignUp();
+            AssertSignUpSuccess();
+        }
+
+        [Test, Order(8)]
+        public void SignUp_With_Invalid_Email()
+        {
+            NavigateToSignUp();
+
+            EnterSignUpDetails(
+                "User" + DateTime.Now.Ticks,
+                config.SignUp.InvalidEmail,
+                config.SignUp.ValidPassword,
+                config.SignUp.ValidPassword
+            );
+
+            ClickSignUp();
+            AssertValidationError();
+        }
+
+        [Test, Order(9)]
+        public void SignUp_With_Password_Mismatch()
+        {
+            NavigateToSignUp();
+
+            EnterSignUpDetails(
+                "User" + DateTime.Now.Ticks,
+                "mail@test.com",
+                config.SignUp.ValidPassword,
+                "Mismatch123"
+            );
+
+            ClickSignUp();
+            AssertValidationError();
+        }
+
+        // ================= HELPER METHODS =================
+
+        private void NavigateToLogin()
+        {
+            driver.Navigate().GoToUrl(config.BaseUrl + "Account/Login");
+            wait.Until(d => d.FindElement(By.Id("Email")));
+        }
+
+        private void NavigateToSignUp()
+        {
+            driver.Navigate().GoToUrl(config.BaseUrl + "Account/SignUp");
+            wait.Until(d => d.FindElement(By.Id("UserName")));
+        }
+
+        private void EnterLoginCredentials(string user, string password)
+        {
+            driver.FindElement(By.Id("Email")).Clear();
+            driver.FindElement(By.Id("Email")).SendKeys(user);
+
+            driver.FindElement(By.Id("Password")).Clear();
+            driver.FindElement(By.Id("Password")).SendKeys(password);
+        }
+
+        private void ClickLogin()
         {
             driver.FindElement(By.XPath("//button[contains(text(),'Login')]")).Click();
         }
 
-        bool IsUserLoggedIn()
+        private void EnterSignUpDetails(string user, string email, string pass, string confirm)
+        {
+            driver.FindElement(By.Id("UserName")).SendKeys(user);
+            driver.FindElement(By.Id("Email")).SendKeys(email);
+            driver.FindElement(By.Id("Password")).SendKeys(pass);
+            driver.FindElement(By.Id("ConfirmPassword")).SendKeys(confirm);
+        }
+
+        private void ClickSignUp()
+        {
+            driver.FindElement(By.XPath("//button[contains(text(),'Sign Up')]")).Click();
+        }
+
+        private void AssertLoginSuccess()
+        {
+            var welcome = wait.Until(d => d.FindElement(By.XPath("//header//nav//span")));
+            Assert.That(welcome.Displayed, Is.True);
+        }
+
+        private void AssertLoginFailure()
+        {
+            var error = wait.Until(d =>
+                d.FindElement(By.XPath("//*[contains(@class,'text-danger') or contains(@class,'alert-danger')]"))
+            );
+            Assert.That(error.Displayed, Is.True);
+        }
+
+        private void AssertSignUpSuccess()
+        {
+            var success = wait.Until(d =>
+                d.FindElement(By.XPath("//*[contains(@class,'text-success') or contains(@class,'alert-success')]"))
+            );
+            Assert.That(success.Displayed, Is.True);
+        }
+
+        private void AssertValidationError()
+        {
+            var error = wait.Until(d =>
+                d.FindElement(By.XPath("//*[contains(@class,'text-danger') or contains(@class,'field-validation-error')]"))
+            );
+            Assert.That(error.Displayed, Is.True);
+        }
+
+        private void Logout()
         {
             try
             {
-                return driver.FindElement(By.XPath("//header//nav//span")).Displayed;
+                driver.FindElement(By.XPath("//a[contains(text(),'Logout')]")).Click();
             }
-            catch { return false; }
+            catch { }
         }
 
-        bool IsLoginPageVisible()
-        {
-            try
-            {
-                return driver.FindElement(By.Id("Email")).Displayed;
-            }
-            catch { return false; }
-        }
-
-        bool IsErrorDisplayed()
-        {
-            try
-            {
-                return driver.FindElement(By.XPath(
-                    "//*[contains(@class,'alert-danger') or contains(@class,'text-danger')]")).Displayed;
-            }
-            catch { return false; }
-        }
-
-        void EnsureLoggedOut()
-        {
-            try
-            {
-                var logoutBtn = driver.FindElement(By.XPath("//a[contains(text(),'Logout')]"));
-                if (logoutBtn.Displayed)
-                    logoutBtn.Click();
-                Thread.Sleep(2000);
-            }
-            catch { /* already logged out */ }
-        }
-
-        // ===== OneTime TearDown =====
-        [OneTimeTearDown]
+        // ================= TEARDOWN =================
+        [TearDown]
         public void TearDown()
         {
-            Console.WriteLine("Tests completed. Close browser manually.");
-            Thread.Sleep(30000); // keeps browser open for 30 seconds
-            driver.Quit();
+            //driver.Quit();
         }
     }
 }
