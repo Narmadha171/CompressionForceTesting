@@ -1,0 +1,237 @@
+{
+  "BASE_URL": "https://localhost:44379/",
+  "LoginPageUsernameTest": [
+    {
+      "TestName": "ValidUser_Success",
+      "Username": "narmadha",
+      "Password": "22csr080",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "InvalidUser_Failure",
+      "Username": "invaliduser",
+      "Password": "22csr080",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "WrongPassword_Failure",
+      "Username": "narmadha",
+      "Password": "WrongPassword",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "InvalidUserWrongPassword_Failure",
+      "Username": "invaliduser",
+      "Password": "WrongPassword",
+      "ExpectedResult": "Failure"
+    }
+  ],
+  "LoginPageEmailTest": [
+    {
+      "TestName": "ValidEmail_Success",
+      "Email": "rameshmesh117@gmail.com",
+      "Password": "22csr080",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "InvalidEmail_Failure",
+      "Email": "invaliduser@example.com",
+      "Password": "22csr080",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "WrongPassword_Failure",
+      "Email": "rameshmesh117@gmail.com",
+      "Password": "WrongPassword",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "InvalidEmailWrongPassword_Failure",
+      "Email": "invaliduser@example.com",
+      "Password": "WrongPassword",
+      "ExpectedResult": "Failure"
+    }
+  ],
+  "LoginPageFormatTest": [
+    {
+      "TestName": "EmptyUserEmail_Success",
+      "Username": "",
+      "Password": "22csr080",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "ValidUserEmptyPassword_Failure",
+      "Username": "narmadha",
+      "Password": "",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "ValidEmailEmptyPassword_Failure",
+      "Username": "rameshmesh117@gmail.com",
+      "Password": "",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmptyUserEmailEmptyPassword_Failure",
+      "Username": "",
+      "Password": "",
+      "ExpectedResult": "Failure"
+    }
+  ],
+  "SignUpUserTest": [
+    {
+      "TestName": "ValidSignUp_Success",
+      "Username": "validuser",
+      "Email": "validuser@example.com",
+      "Password": "NewPassword123",
+      "ConfirmPassword": "NewPassword123",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "DuplicateUser_Failure",
+      "Username": "duplicateuser",
+      "Email": "duplicateuser@example.com",
+      "Password": "ValidPassword123",
+      "ConfirmPassword": "ValidPassword123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmptyUser_Failure",
+      "Username": "",
+      "Email": "emptyuser@example.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "LeftEdgeCaseUser_Failure",
+      "Username": "ab",
+      "Email": "emptyuser@example.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "RightEdgeCaseUser_Success",
+      "Username": "abcd",
+      "Email": "emptyuser@example.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Success"
+    }
+  ],
+  "SignUpEmailTest": [
+    {
+      "TestName": "ValidSignUp_Success",
+      "Username": "validuser",
+      "Email": "validuser@example.com",
+      "Password": "NewPassword123",
+      "ConfirmPassword": "NewPassword123",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "DuplicateEmail_Failure",
+      "Username": "validuser",
+      "Email": "duplicateemail@example.com",
+      "Password": "ValidPassword123",
+      "ConfirmPassword": "ValidPassword123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmptyEmail_Failure",
+      "Username": "validuser",
+      "Email": "",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmailCase1_Failure",
+      "Username": "validuser",
+      "Email": "@gmail.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmailCase2_Failure",
+      "Username": "validuser",
+      "Email": "usergmail.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "LeftEdgeCaseUser_Failure",
+      "Username": "ab",
+      "Email": "emptyuser@example.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "RightEdgeCaseUser_Success",
+      "Username": "abcd",
+      "Email": "emptyuser@example.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Success"
+    },
+    {
+      "TestName": "EmptyEmail_Failure",
+      "Username": "userwithoutemail",
+      "Email": "",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "EmptyPassword_Failure",
+      "Username": "usernopassword",
+      "Email": "usernopassword@example.com",
+      "Password": "",
+      "ConfirmPassword": "",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "InvalidEmailFormat_Failure",
+      "Username": "userbademail",
+      "Email": "user@.com",
+      "Password": "Password123",
+      "ConfirmPassword": "Password123",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "WeakPassword_Failure",
+      "Username": "weakpassuser",
+      "Email": "weakpass@example.com",
+      "Password": "12345",
+      "ConfirmPassword": "12345",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "ConfirmPasswordMismatch_Failure",
+      "Username": "emailuser",
+      "Email": "emailuser@example.com",
+      "Password": "SecurePass123",
+      "ConfirmPassword": "SecurePass321",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "BothPasswordFieldsEmpty_Failure",
+      "Username": "emptyfields",
+      "Email": "empty@example.com",
+      "Password": "",
+      "ConfirmPassword": "",
+      "ExpectedResult": "Failure"
+    },
+    {
+      "TestName": "WeakPassword_Failure",
+      "Username": "weakpass",
+      "Email": "weak@example.com",
+      "Password": "123",
+      "ConfirmPassword": "123",
+      "ExpectedResult": "Failure"
+    }
+  ]
+}
