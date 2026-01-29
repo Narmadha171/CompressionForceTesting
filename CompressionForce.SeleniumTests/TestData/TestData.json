@@ -1,5 +1,5 @@
 {
-  "BASE_URL": "https://localhost:44379/",
+  "BASE_URL": "https://localhost:44391/Account/Login",
   "LoginPageUsernameTest": [
     {
       "TestName": "ValidUser_Success",

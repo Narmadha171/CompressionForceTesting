@@ -22,6 +22,9 @@ namespace CompressionForce.SeleniumTests.Tests
         {
             var options = new ChromeOptions();
             options.AddArgument("--ignore-certificate-errors");
+            options.AddArgument("--headless");              // Run in headless mode
+            options.AddArgument("--disable-gpu");           // Recommended for Windows
+            options.AddArgument("--window-size=1920,1080"); // Set a fixed window size
 
             driver = new ChromeDriver(options);
             // Fix for CS8602: Use ! to tell compiler driver is initialized
@@ -44,7 +47,9 @@ namespace CompressionForce.SeleniumTests.Tests
             driver.FindElement(By.Id("Password")).SendKeys(data.Password ?? string.Empty);
             driver.FindElement(By.XPath("//button[@type='submit']")).Click();
 
-            bool isSuccess = driver.Url.Contains("Dashboard") || driver.Url.Contains("Home");
+            bool isSuccess = driver.Url.Contains("Dashboard")
+                    || driver.Url.Contains("Home")
+                    || driver.Url.TrimEnd('/') == "https://localhost:44391";
             bool expected = data.ExpectedResult.Equals("Success", StringComparison.OrdinalIgnoreCase);
 
             Assert.That(isSuccess, Is.EqualTo(expected), $"Login result mismatch for: {data.TestName}");

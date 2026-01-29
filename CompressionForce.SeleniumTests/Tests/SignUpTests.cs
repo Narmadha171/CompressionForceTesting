@@ -14,14 +14,17 @@ namespace CompressionForce.SeleniumTests.Tests
     {
         private ChromeDriver? driver;
         private WebDriverWait? wait;
-        private const string SIGNUP_URL = "https://localhost:44379/Account/Register";
+        private const string SIGNUP_URL = "https://localhost:44391/Account/Register";
 
         [SetUp]
         public void Setup()
         {
             var options = new ChromeOptions();
             options.AddArgument("--ignore-certificate-errors");
-            options.AddArgument("--start-maximized");
+            //options.AddArgument("--start-maximized"); 
+            options.AddArgument("--headless");              // Run in headless mode
+            options.AddArgument("--disable-gpu");           // Recommended for Windows
+            options.AddArgument("--window-size=1920,1080"); // Set a fixed window size
 
             driver = new ChromeDriver(options);
             wait = new WebDriverWait(driver!, TimeSpan.FromSeconds(10));
