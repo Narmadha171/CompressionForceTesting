@@ -2,21 +2,15 @@
 {
     public class LoginTestCase
     {
-        public string TestName { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ExpectedResult { get; set; }
+        public string TestName { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ExpectedResult { get; set; } = string.Empty;
 
-        public LoginTestCase()
-        {
-            TestName = string.Empty;
-            Username = string.Empty;
-            Email = string.Empty;
-            Password = string.Empty;
-            ExpectedResult = string.Empty;
-        }
-
+        /// <summary>
+        /// Returns the Username if available, otherwise returns the Email.
+        /// </summary>
         public string GetLoginIdentifier()
         {
             return !string.IsNullOrWhiteSpace(Username) ? Username : Email;

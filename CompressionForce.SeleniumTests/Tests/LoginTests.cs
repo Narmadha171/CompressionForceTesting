@@ -4,66 +4,59 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
+using CompressionForce.SeleniumTests.Models;
+using CompressionForce.SeleniumTests.TestDataSources;
+using CompressionForce.SeleniumTests.Utilities;
 
 namespace CompressionForce.SeleniumTests.Tests
 {
     [TestFixture]
     public class LoginTests
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-        private const string BASE_URL = "https://localhost:44379/";
+        // Fix for CS8618/CS8625: Mark as nullable
+        private ChromeDriver? driver;
+        private WebDriverWait? wait;
 
         [SetUp]
         public void Setup()
         {
             var options = new ChromeOptions();
             options.AddArgument("--ignore-certificate-errors");
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--disable-popup-blocking");
-            options.AddArgument("--disable-notifications");
-            options.AddArgument("--no-sandbox");
-            options.AddArgument("--disable-dev-shm-usage");
 
             driver = new ChromeDriver(options);
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            // Fix for CS8602: Use ! to tell compiler driver is initialized
+            wait = new WebDriverWait(driver!, TimeSpan.FromSeconds(10));
         }
+      
 
         [Test]
-        public void Login_Test()
+        [TestCaseSource(typeof(TestCaseSourceProvider), nameof(TestCaseSourceProvider.GetLoginTestData))]
+        public void Login_Test(LoginTestCase data)
         {
-            driver.Navigate().GoToUrl(BASE_URL);
+            var root = TestDataReader.LoadTestData();
+            // Fix for CS8602: driver! ensures we know it's not null here
+            driver!.Navigate().GoToUrl(root.BASE_URL);
 
-            var emailInput = wait.Until(ExpectedConditions.ElementIsVisible(By.Id("Email")));
+            var emailInput = wait!.Until(ExpectedConditions.ElementIsVisible(By.Id("Email")));
             emailInput.Clear();
-            emailInput.SendKeys("rameshmesh117@gmail.com");
+            emailInput.SendKeys(data.GetLoginIdentifier() ?? string.Empty);
 
-            var passwordInput = wait.Until(ExpectedConditions.ElementIsVisible(By.Id("Password")));
-            passwordInput.Clear();
-            passwordInput.SendKeys("22csr080");
+            driver.FindElement(By.Id("Password")).SendKeys(data.Password ?? string.Empty);
+            driver.FindElement(By.XPath("//button[@type='submit']")).Click();
 
-            var rememberMe = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("RememberMe")));
-            rememberMe.Click();
+            bool isSuccess = driver.Url.Contains("Dashboard") || driver.Url.Contains("Home");
+            bool expected = data.ExpectedResult.Equals("Success", StringComparison.OrdinalIgnoreCase);
 
-            var loginBtn = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//button[@type='submit']")));
-            loginBtn.Click();
-
-            // Debugging: print actual URL
-            Console.WriteLine("Redirected URL: " + driver.Url);
-
-            // ✅ Updated assertion
-            Assert.That(
-                driver.Url.Contains("Dashboard") || driver.Url.Contains("Home") || driver.Url.Contains("Account"),
-                "Login failed or did not redirect correctly."
-            );
+            Assert.That(isSuccess, Is.EqualTo(expected), $"Login result mismatch for: {data.TestName}");
         }
 
         [TearDown]
         public void TearDown()
         {
+            // Fix for NUnit1032 and null safety
             if (driver != null)
             {
-                try { driver.Quit(); } catch { }
+                driver.Quit();
                 driver.Dispose();
                 driver = null;
             }

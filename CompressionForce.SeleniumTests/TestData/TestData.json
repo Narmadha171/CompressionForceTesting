@@ -54,10 +54,10 @@
   ],
   "LoginPageFormatTest": [
     {
-      "TestName": "EmptyUserEmail_Success",
+      "TestName": "EmptyUserEmail_Failure",
       "Username": "",
       "Password": "22csr080",
-      "ExpectedResult": "Success"
+      "ExpectedResult": "Failure"
     },
     {
       "TestName": "ValidUserEmptyPassword_Failure",

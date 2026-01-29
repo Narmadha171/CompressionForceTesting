@@ -11,16 +11,18 @@ namespace CompressionForce.SeleniumTests.Utilities
 
         public static TestDataRoot LoadTestData()
         {
-            if (_cachedData != null)
-                return _cachedData;
+            if (_cachedData != null) return _cachedData;
 
+            // AppDomain.CurrentDomain.BaseDirectory targets bin\Debug\net10.0\
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            var jsonPath = Path.Combine(baseDir, "TestData", "testdata.json");
+
+            // FIX: You MUST include "TestData" because of your folder structure
+            var jsonPath = Path.Combine(baseDir, "TestData", "TestData.json");
 
             if (!File.Exists(jsonPath))
-                throw new FileNotFoundException($"Test data file not found: {jsonPath}");
-
-            Console.WriteLine($"Loading test data from: {jsonPath}");
+            {
+                throw new FileNotFoundException($"File not found at: {jsonPath}");
+            }
 
             var json = File.ReadAllText(jsonPath);
             _cachedData = JsonConvert.DeserializeObject<TestDataRoot>(json) ?? new TestDataRoot();
